@@ -1,4 +1,4 @@
-package co.edu.uniquindio.sivitrix.producto;
+package co.edu.uniquindio.sivitrix.producto.entity;
 
 /**
  * SWR-31: categorias predefinidas de producto.

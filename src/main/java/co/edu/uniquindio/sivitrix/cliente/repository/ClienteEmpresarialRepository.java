@@ -1,5 +1,6 @@
-package co.edu.uniquindio.sivitrix.cliente;
+package co.edu.uniquindio.sivitrix.cliente.repository;
 
+import co.edu.uniquindio.sivitrix.cliente.entity.ClienteEmpresarial;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

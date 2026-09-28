@@ -1,5 +1,6 @@
-package co.edu.uniquindio.sivitrix.producto;
+package co.edu.uniquindio.sivitrix.producto.service;
 
+import co.edu.uniquindio.sivitrix.producto.entity.CategoriaProducto;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoRequest;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoResponse;
 

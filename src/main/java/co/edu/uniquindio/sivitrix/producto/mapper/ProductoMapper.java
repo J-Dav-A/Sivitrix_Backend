@@ -1,8 +1,9 @@
-package co.edu.uniquindio.sivitrix.producto;
+package co.edu.uniquindio.sivitrix.producto.mapper;
 
 import co.edu.uniquindio.sivitrix.common.util.MoneyUtils;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoRequest;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoResponse;
+import co.edu.uniquindio.sivitrix.producto.entity.Producto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

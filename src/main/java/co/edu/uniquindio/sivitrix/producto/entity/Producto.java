@@ -1,4 +1,4 @@
-package co.edu.uniquindio.sivitrix.producto;
+package co.edu.uniquindio.sivitrix.producto.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

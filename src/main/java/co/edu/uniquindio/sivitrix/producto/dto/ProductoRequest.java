@@ -1,6 +1,6 @@
 package co.edu.uniquindio.sivitrix.producto.dto;
 
-import co.edu.uniquindio.sivitrix.producto.CategoriaProducto;
+import co.edu.uniquindio.sivitrix.producto.entity.CategoriaProducto;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;

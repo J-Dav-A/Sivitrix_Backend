@@ -1,4 +1,4 @@
-package co.edu.uniquindio.sivitrix.cliente;
+package co.edu.uniquindio.sivitrix.cliente.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

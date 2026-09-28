@@ -1,5 +1,7 @@
-package co.edu.uniquindio.sivitrix.producto;
+package co.edu.uniquindio.sivitrix.producto.controller;
 
+import co.edu.uniquindio.sivitrix.producto.entity.CategoriaProducto;
+import co.edu.uniquindio.sivitrix.producto.service.ProductoService;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoRequest;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoResponse;
 import jakarta.validation.Valid;

@@ -1,5 +1,6 @@
-package co.edu.uniquindio.sivitrix.cliente;
+package co.edu.uniquindio.sivitrix.cliente.controller;
 
+import co.edu.uniquindio.sivitrix.cliente.service.ClienteEmpresarialService;
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteRequest;
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteResponse;
 import jakarta.validation.Valid;

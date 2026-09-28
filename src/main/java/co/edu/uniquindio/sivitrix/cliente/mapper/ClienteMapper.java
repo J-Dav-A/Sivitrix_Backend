@@ -1,7 +1,8 @@
-package co.edu.uniquindio.sivitrix.cliente;
+package co.edu.uniquindio.sivitrix.cliente.mapper;
 
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteRequest;
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteResponse;
+import co.edu.uniquindio.sivitrix.cliente.entity.ClienteEmpresarial;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

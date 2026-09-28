@@ -1,4 +1,4 @@
-package co.edu.uniquindio.sivitrix.cliente;
+package co.edu.uniquindio.sivitrix.cliente.service;
 
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteRequest;
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteResponse;

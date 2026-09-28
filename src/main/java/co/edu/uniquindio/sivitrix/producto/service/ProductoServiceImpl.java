@@ -1,7 +1,11 @@
-package co.edu.uniquindio.sivitrix.producto;
+package co.edu.uniquindio.sivitrix.producto.service;
 
 import co.edu.uniquindio.sivitrix.common.exception.DuplicateResourceException;
 import co.edu.uniquindio.sivitrix.common.exception.ResourceNotFoundException;
+import co.edu.uniquindio.sivitrix.producto.entity.CategoriaProducto;
+import co.edu.uniquindio.sivitrix.producto.entity.Producto;
+import co.edu.uniquindio.sivitrix.producto.mapper.ProductoMapper;
+import co.edu.uniquindio.sivitrix.producto.repository.ProductoRepository;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoRequest;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoResponse;
 import lombok.RequiredArgsConstructor;

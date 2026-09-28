@@ -1,7 +1,10 @@
-package co.edu.uniquindio.sivitrix.cliente;
+package co.edu.uniquindio.sivitrix.cliente.service;
 
+import co.edu.uniquindio.sivitrix.cliente.entity.ClienteEmpresarial;
+import co.edu.uniquindio.sivitrix.cliente.mapper.ClienteMapper;
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteRequest;
 import co.edu.uniquindio.sivitrix.cliente.dto.ClienteResponse;
+import co.edu.uniquindio.sivitrix.cliente.repository.ClienteEmpresarialRepository;
 import co.edu.uniquindio.sivitrix.common.exception.DuplicateResourceException;
 import co.edu.uniquindio.sivitrix.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
