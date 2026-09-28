@@ -1,0 +1,17 @@
+package co.edu.uniquindio.sivitrix.producto;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
+
+    boolean existsByCodigo(String codigo);
+
+    Optional<Producto> findByCodigo(String codigo);
+
+    // SWR-12: consulta filtrada por nombre o categoria (ver ProductoService).
+    java.util.List<Producto> findByNombreContainingIgnoreCase(String nombre);
+
+    java.util.List<Producto> findByCategoria(CategoriaProducto categoria);
+}
