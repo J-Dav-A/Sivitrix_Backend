@@ -10,6 +10,7 @@ import co.edu.uniquindio.sivitrix.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import co.edu.uniquindio.sivitrix.common.util.FuzzySearchUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,9 +41,15 @@ public class ClienteEmpresarialServiceImpl implements ClienteEmpresarialService 
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> listar(String nombre) {
-        List<ClienteEmpresarial> clientes = (nombre != null && !nombre.isBlank())
-                ? clienteRepository.findByNombreContainingIgnoreCase(nombre)
-                : clienteRepository.findAll();
+        List<ClienteEmpresarial> clientes = clienteRepository.findAll();
+
+        if (nombre != null && !nombre.isBlank()) {
+            clientes = clientes.stream()
+                    .filter(c -> c.getNit().toLowerCase().contains(nombre.toLowerCase())
+                            || FuzzySearchUtils.coincideAproximado(c.getNombre(), nombre))
+                    .toList();
+        }
+
         return clientes.stream().map(clienteMapper::toResponse).toList();
     }
 

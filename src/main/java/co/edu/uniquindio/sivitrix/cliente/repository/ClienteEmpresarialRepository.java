@@ -11,6 +11,4 @@ public interface ClienteEmpresarialRepository extends JpaRepository<ClienteEmpre
     boolean existsByNit(String nit);
 
     Optional<ClienteEmpresarial> findByNit(String nit);
-
-    List<ClienteEmpresarial> findByNombreContainingIgnoreCase(String nombre);
 }

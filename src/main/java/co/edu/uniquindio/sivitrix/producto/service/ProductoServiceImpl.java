@@ -11,6 +11,7 @@ import co.edu.uniquindio.sivitrix.producto.dto.ProductoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import co.edu.uniquindio.sivitrix.common.util.FuzzySearchUtils;
 
 import java.util.List;
 
@@ -40,14 +41,15 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductoResponse> listar(String nombre, CategoriaProducto categoria) {
-        // SWR-12: consulta filtrada por nombre o categoria.
-        List<Producto> productos;
+        List<Producto> productos = (categoria != null)
+                ? productoRepository.findByCategoria(categoria)
+                : productoRepository.findAll();
+
         if (nombre != null && !nombre.isBlank()) {
-            productos = productoRepository.findByNombreContainingIgnoreCase(nombre);
-        } else if (categoria != null) {
-            productos = productoRepository.findByCategoria(categoria);
-        } else {
-            productos = productoRepository.findAll();
+            productos = productos.stream()
+                    .filter(p -> p.getCodigo().toLowerCase().contains(nombre.toLowerCase())
+                            || FuzzySearchUtils.coincideAproximado(p.getNombre(), nombre))
+                    .toList();
         }
         return productos.stream().map(productoMapper::toResponse).toList();
     }
