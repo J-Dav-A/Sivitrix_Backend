@@ -18,4 +18,6 @@ public interface VentaService {
     void confirmarTrasAutorizacion(Long ventaId);
 
     void rechazarTrasAutorizacion(Long ventaId);
+
+    VentaResponse cancelar(Long id, String motivo);
 }

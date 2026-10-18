@@ -51,6 +51,7 @@ public class FacturaServiceImpl implements FacturaService {
         return new FacturaResponse(
                 f.getId(), f.getNumero(), v.getId(), f.getFechaEmision(), v.getTipoPago(),
                 new FacturaResponse.Cliente(c.getNit(), c.getNombre(), c.getDireccion(), c.getTelefono(), c.getEmail()),
-                lineas, f.getSubtotal(), f.getIva(), f.getTotal());
+                lineas, f.getSubtotal(), f.getIva(), f.getTotal(),
+                v.getEstado() == co.edu.uniquindio.sivitrix.venta.entity.EstadoVenta.CANCELADA);
     }
 }

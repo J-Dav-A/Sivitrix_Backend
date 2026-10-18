@@ -154,6 +154,43 @@ public class VentaServiceImpl implements VentaService {
         ventaRepository.save(venta);
     }
 
+    @Override
+    public VentaResponse cancelar(Long id, String motivo) {
+        Venta venta = buscarOFallar(id);
+        if (venta.getEstado() != EstadoVenta.CONFIRMADA) {
+            throw new BusinessRuleException("Solo se pueden cancelar ventas confirmadas (estado actual: "
+                    + venta.getEstado() + ")");
+        }
+
+        if (venta.getTipoPago() == TipoPago.CREDITO) {
+            Credito credito = creditoRepository.findByVentaId(venta.getId()).orElse(null);
+            if (credito != null) {
+                boolean hayPagos = credito.getCuotas().stream()
+                        .anyMatch(c -> c.getEstado() == co.edu.uniquindio.sivitrix.credito.entity.EstadoCuota.PAGADA);
+                if (hayPagos) {
+                    throw new BusinessRuleException("No se puede cancelar: el credito ya tiene cuotas pagadas");
+                }
+                ClienteEmpresarial cliente = credito.getCliente();
+                cliente.setSaldoCredito(MoneyUtils.redondear(
+                        cliente.getSaldoCredito().subtract(credito.getValorTotal()).max(BigDecimal.ZERO)));
+                clienteRepository.save(cliente);
+
+                credito.setEstado(EstadoCredito.CANCELADO);
+                credito.setObservacion("Venta cancelada");
+                creditoRepository.save(credito);
+            }
+        }
+
+        String detalleMotivo = (motivo == null || motivo.isBlank()) ? "" : ": " + motivo;
+        for (DetalleVenta d : venta.getDetalles()) {
+            inventarioService.registrarEntrada(d.getProducto(), d.getCantidad(),
+                    "Cancelacion de la venta " + venta.getNumero() + detalleMotivo, null);
+        }
+
+        venta.setEstado(EstadoVenta.CANCELADA);
+        return toResponse(ventaRepository.save(venta));
+    }
+
     // F-01 + F-06: al confirmarse la venta se descuenta el stock y se emite la factura.
     private void descontarStockYFacturar(Venta venta) {
         for (DetalleVenta d : venta.getDetalles()) {

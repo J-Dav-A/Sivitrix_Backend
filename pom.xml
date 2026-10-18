@@ -79,19 +79,11 @@
             <version>${mapstruct.version}</version>
         </dependency>
 
-        <!--
-          Seguridad: dependencia lista para cuando se implementen los roles
-          Vendedor / Administrador (SWR-26, autorizacion de creditos, etc.).
-          Se agrega ahora pero NO se activa configuracion todavia.
-        -->
-        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        -->
 
-        <!-- Pruebas -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

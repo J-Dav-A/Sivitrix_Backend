@@ -16,7 +16,8 @@ public record FacturaResponse(
         List<Linea> lineas,
         BigDecimal subtotal,
         BigDecimal iva,
-        BigDecimal total
+        BigDecimal total,
+        Boolean anulada
 ) {
     public record Cliente(String nit, String nombre, String direccion, String telefono, String email) {
     }

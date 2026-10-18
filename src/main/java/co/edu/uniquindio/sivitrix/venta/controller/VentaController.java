@@ -40,6 +40,12 @@ public class VentaController {
         return ventaService.obtenerPorId(id);
     }
 
+    @PostMapping("/{id}/cancelar")
+    public VentaResponse cancelar(@PathVariable Long id,
+                                  @RequestBody(required = false) java.util.Map<String, String> cuerpo) {
+        return ventaService.cancelar(id, cuerpo == null ? null : cuerpo.get("motivo"));
+    }
+
     @GetMapping("/{id}/factura")
     public FacturaResponse factura(@PathVariable Long id) {
         return facturaService.obtenerPorVenta(id);

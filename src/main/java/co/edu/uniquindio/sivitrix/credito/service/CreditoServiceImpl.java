@@ -173,8 +173,7 @@ public class CreditoServiceImpl implements CreditoService {
                 .toList();
 
         BigDecimal saldoPendiente = c.getCuotas().stream()
-                .filter(q -> q.getEstado() != EstadoCuota.PAGADA)
-                .map(Cuota::getValor)
+                .filter(q -> c.getEstado() != EstadoCredito.CANCELADO && q.getEstado() != EstadoCuota.PAGADA)                .map(Cuota::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return new CreditoResponse(

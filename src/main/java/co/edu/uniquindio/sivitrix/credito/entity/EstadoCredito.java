@@ -4,6 +4,7 @@ public enum EstadoCredito {
     PENDIENTE_AUTORIZACION,
     APROBADO,
     RECHAZADO,
-    PAGADO
+    PAGADO,
+    CANCELADO
 }
 

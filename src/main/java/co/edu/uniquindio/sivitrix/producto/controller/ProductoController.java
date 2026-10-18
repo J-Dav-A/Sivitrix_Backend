@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import co.edu.uniquindio.sivitrix.seguridad.ContextoSeguridad;
 
 import java.net.URI;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final ContextoSeguridad contexto;
 
     @PostMapping
     public ResponseEntity<ProductoResponse> crear(@Valid @RequestBody ProductoRequest request) {
@@ -37,12 +39,12 @@ public class ProductoController {
     public List<ProductoResponse> listar(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) CategoriaProducto categoria) {
-        return productoService.listar(nombre, categoria);
+        return productoService.listar(nombre, categoria).stream().map(this::filtrar).toList();
     }
 
     @GetMapping("/{id}")
     public ProductoResponse obtener(@PathVariable Long id) {
-        return productoService.obtenerPorId(id);
+        return filtrar(productoService.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
@@ -55,4 +57,15 @@ public class ProductoController {
     public void eliminar(@PathVariable Long id) {
         productoService.eliminar(id);
     }
+
+    // SWR-26: oculta costo y margen a quien no sea administrador.
+    private ProductoResponse filtrar(ProductoResponse p) {
+        if (contexto.esAdministrador()) {
+            return p;
+        }
+        return new ProductoResponse(p.id(), p.codigo(), p.nombre(), p.categoria(), p.precioVenta(),
+                null, null, null, p.stockActual(), p.stockMinimo(), p.diferenciaConMinimo(),
+                p.creadoEn(), p.actualizadoEn());
+    }
+
 }
