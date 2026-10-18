@@ -1,10 +1,13 @@
 package co.edu.uniquindio.sivitrix.cliente.dto;
 
 import co.edu.uniquindio.sivitrix.common.validation.ValidNit;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 
 public record ClienteRequest(
 
@@ -35,6 +38,11 @@ public record ClienteRequest(
 
         @NotBlank(message = "la cedula del contacto es obligatoria")
         @Pattern(regexp = "\\d{6,12}", message = "la cedula debe contener solo digitos (6 a 12)")
-        String contactoCedula
+        String contactoCedula,
+
+        // F-05: cupo de credito (opcional; si no se envia queda en 0 al crear
+        // y se conserva el valor anterior al editar).
+        @DecimalMin(value = "0.00", message = "el limite de credito no puede ser negativo")
+        BigDecimal limiteCredito
 ) {
 }

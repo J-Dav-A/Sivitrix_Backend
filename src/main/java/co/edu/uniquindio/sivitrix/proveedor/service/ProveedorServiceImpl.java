@@ -1,6 +1,9 @@
 package co.edu.uniquindio.sivitrix.proveedor.service;
 
+import co.edu.uniquindio.sivitrix.common.exception.BusinessRuleException;
 import co.edu.uniquindio.sivitrix.common.exception.DuplicateResourceException;
+import co.edu.uniquindio.sivitrix.pedido.entity.EstadoPedido;
+import co.edu.uniquindio.sivitrix.pedido.repository.PedidoRepository;
 import co.edu.uniquindio.sivitrix.common.exception.ResourceNotFoundException;
 import co.edu.uniquindio.sivitrix.producto.entity.Producto;
 import co.edu.uniquindio.sivitrix.producto.repository.ProductoRepository;
@@ -25,6 +28,7 @@ public class ProveedorServiceImpl implements ProveedorService {
     private final ProveedorRepository proveedorRepository;
     private final ProductoRepository productoRepository;
     private final ProveedorMapper proveedorMapper;
+    private final PedidoRepository pedidoRepository;
 
     @Override
     public ProveedorResponse crear(ProveedorRequest request) {
@@ -72,9 +76,13 @@ public class ProveedorServiceImpl implements ProveedorService {
 
     @Override
     public void eliminar(Long id) {
-        // TODO (SWR-14): cuando exista el modulo de Pedidos, verificar aqui
-        // que el proveedor no tenga pedidos activos antes de eliminarlo.
         Proveedor proveedor = buscarOFallar(id);
+        // SWR-14: no se elimina un proveedor con pedidos activos.
+        if (pedidoRepository.existsByProveedorIdAndEstadoIn(id,
+                List.of(EstadoPedido.REGISTRADO, EstadoPedido.RECIBIDO_PARCIAL))) {
+            throw new BusinessRuleException(
+                    "No se puede eliminar el proveedor porque tiene pedidos activos (registrados o con recepcion parcial)");
+        }
         proveedorRepository.delete(proveedor);
     }
 

@@ -13,7 +13,10 @@ public record ClienteResponse(
         String contactoNombre,
         String contactoCedula,
         BigDecimal saldoCredito,
+        BigDecimal limiteCredito,
+        BigDecimal cupoDisponible,
         LocalDateTime creadoEn,
         LocalDateTime actualizadoEn
 ) {
 }
+

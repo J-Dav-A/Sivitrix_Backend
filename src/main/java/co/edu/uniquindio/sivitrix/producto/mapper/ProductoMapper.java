@@ -22,7 +22,7 @@ public interface ProductoMapper {
     @Mapping(target = "margenValor", expression = "java(calcularMargenValor(producto))")
     @Mapping(target = "margenPorcentaje", expression = "java(calcularMargenPorcentaje(producto))")
     @Mapping(target = "diferenciaConMinimo",
-             expression = "java(producto.getStockActual() - producto.getStockMinimo())")
+            expression = "java(producto.getStockActual() - producto.getStockMinimo())")
     ProductoResponse toResponse(Producto producto);
 
     // SWR-25: margen = precioVenta - costoAdquisicion, redondeado (SWR-20).

@@ -54,6 +54,10 @@ public class ClienteEmpresarial {
     @Column(name = "saldo_credito", nullable = false, precision = 12, scale = 2)
     private BigDecimal saldoCredito;
 
+    // F-05: cupo maximo de credito aprobado para el cliente.
+    @Column(name = "limite_credito", nullable = false, precision = 14, scale = 2)
+    private BigDecimal limiteCredito;
+
     @Column(name = "creado_en", nullable = false, updatable = false)
     private LocalDateTime creadoEn;
 
@@ -68,6 +72,9 @@ public class ClienteEmpresarial {
         if (this.saldoCredito == null) {
             this.saldoCredito = BigDecimal.ZERO.setScale(2);
         }
+        if (this.limiteCredito == null) {
+            this.limiteCredito = BigDecimal.ZERO.setScale(2);
+        }
     }
 
     @PreUpdate
@@ -75,3 +82,4 @@ public class ClienteEmpresarial {
         this.actualizadoEn = LocalDateTime.now();
     }
 }
+

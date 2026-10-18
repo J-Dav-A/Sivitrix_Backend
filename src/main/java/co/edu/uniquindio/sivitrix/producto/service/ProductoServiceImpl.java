@@ -8,6 +8,7 @@ import co.edu.uniquindio.sivitrix.producto.mapper.ProductoMapper;
 import co.edu.uniquindio.sivitrix.producto.repository.ProductoRepository;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoRequest;
 import co.edu.uniquindio.sivitrix.producto.dto.ProductoResponse;
+import co.edu.uniquindio.sivitrix.alerta.service.AlertaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
     private final ProductoMapper productoMapper;
+    private final AlertaService alertaService;
 
     @Override
     public ProductoResponse crear(ProductoRequest request) {
@@ -35,6 +37,7 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setStockActual(0); // un producto nuevo inicia sin existencias
 
         Producto guardado = productoRepository.save(producto);
+        alertaService.evaluar(guardado); // F-07: sin existencias => alerta inmediata
         return productoMapper.toResponse(guardado);
     }
 
@@ -71,7 +74,9 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setCostoAdquisicion(request.costoAdquisicion());
         producto.setStockMinimo(request.stockMinimo());
 
-        return productoMapper.toResponse(productoRepository.save(producto));
+        Producto guardado = productoRepository.save(producto);
+        alertaService.evaluar(guardado); // el stock minimo pudo cambiar
+        return productoMapper.toResponse(guardado);
     }
 
     @Override
