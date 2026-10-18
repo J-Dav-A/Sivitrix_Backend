@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import co.edu.uniquindio.sivitrix.common.util.FuzzySearchUtils;
+import co.edu.uniquindio.sivitrix.producto.entity.EstadoStock;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductoResponse> listar(String nombre, CategoriaProducto categoria) {
+    public List<ProductoResponse> listar(String nombre, CategoriaProducto categoria, EstadoStock estadoStock) {
         List<Producto> productos = (categoria != null)
                 ? productoRepository.findByCategoria(categoria)
                 : productoRepository.findAll();
@@ -52,6 +53,12 @@ public class ProductoServiceImpl implements ProductoService {
             productos = productos.stream()
                     .filter(p -> p.getCodigo().toLowerCase().contains(nombre.toLowerCase())
                             || FuzzySearchUtils.coincideAproximado(p.getNombre(), nombre))
+                    .toList();
+        }
+        // SWR-12: filtro por estado de stock (normal, bajo stock o critico).
+        if (estadoStock != null) {
+            productos = productos.stream()
+                    .filter(p -> EstadoStock.de(p.getStockActual(), p.getStockMinimo()) == estadoStock)
                     .toList();
         }
         return productos.stream().map(productoMapper::toResponse).toList();

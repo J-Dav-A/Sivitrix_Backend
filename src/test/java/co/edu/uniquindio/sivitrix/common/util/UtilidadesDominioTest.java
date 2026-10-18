@@ -26,11 +26,12 @@ class UtilidadesDominioTest {
     }
 
     @Test
-    void nitSinGuionSoloExigeEntre7y15Digitos() {
-        assertTrue(NitUtils.esValido("900123456"));
-        assertFalse(NitUtils.esValido("12345"));
-        assertFalse(NitUtils.esValido("ABC1234567"));
+    void nitSinDigitoDeVerificacionEsInvalido() {
+        assertFalse(NitUtils.esValido("900123456"));
+        assertFalse(NitUtils.esValido("12345-6"));
+        assertFalse(NitUtils.esValido("ABC1234567-1"));
         assertFalse(NitUtils.esValido(null));
+        assertTrue(NitUtils.esValido("900123456-8"));
     }
 
     // ---------- Dinero (SWR-20) ----------

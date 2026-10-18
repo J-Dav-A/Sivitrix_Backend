@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import co.edu.uniquindio.sivitrix.seguridad.ContextoSeguridad;
+import co.edu.uniquindio.sivitrix.producto.entity.EstadoStock;
 
 import java.net.URI;
 import java.util.List;
@@ -38,8 +39,9 @@ public class ProductoController {
     @GetMapping
     public List<ProductoResponse> listar(
             @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) CategoriaProducto categoria) {
-        return productoService.listar(nombre, categoria).stream().map(this::filtrar).toList();
+            @RequestParam(required = false) CategoriaProducto categoria,
+            @RequestParam(required = false) EstadoStock estadoStock) {
+        return productoService.listar(nombre, categoria, estadoStock).stream().map(this::filtrar).toList();
     }
 
     @GetMapping("/{id}")

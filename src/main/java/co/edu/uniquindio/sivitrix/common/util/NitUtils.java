@@ -31,25 +31,18 @@ public final class NitUtils {
     }
 
     /**
-     * Valida un NIT con el formato "numero-digitoVerificacion" (ej. 900123456-7).
-     * Si no trae el digito de verificacion, solo valida que sean 7 a 15
-     * digitos numericos.
+     * Valida un NIT con el formato "numero-digitoVerificacion" (ej. 900123456-8).
+     * El digito de verificacion es obligatorio y debe coincidir con el calculado
+     * (SWR-32 y SWR-35).
      */
     public static boolean esValido(String nit) {
         if (nit == null || nit.isBlank()) {
             return false;
         }
-        String limpio = nit.trim();
-
-        if (limpio.contains("-")) {
-            String[] partes = limpio.split("-");
-            if (partes.length != 2 || !partes[0].matches("\\d{7,15}") || !partes[1].matches("\\d")) {
-                return false;
-            }
-            int digitoEsperado = calcularDigitoVerificacion(partes[0]);
-            return digitoEsperado == Integer.parseInt(partes[1]);
+        String[] partes = nit.trim().split("-");
+        if (partes.length != 2 || !partes[0].matches("\\d{7,15}") || !partes[1].matches("\\d")) {
+            return false;
         }
-
-        return limpio.matches("\\d{7,15}");
+        return calcularDigitoVerificacion(partes[0]) == Integer.parseInt(partes[1]);
     }
 }
