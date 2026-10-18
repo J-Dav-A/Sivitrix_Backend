@@ -8,9 +8,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -41,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/creditos/**", "/api/reportes/**",
-                                "/api/proveedores/**", "/api/pedidos/**").hasRole(ADMIN)
+                                "/api/proveedores/**", "/api/pedidos/**", "/api/usuarios/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.POST, "/api/ventas/*/cancelar").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.POST, "/api/inventario/movimientos").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.POST, "/api/productos").hasRole(ADMIN)
@@ -61,13 +60,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Las claves se guardan cifradas con BCrypt; los usuarios viven en la tabla usuario.
     @Bean
-    public UserDetailsService usuarios(SeguridadProperties props) {
-        return new InMemoryUserDetailsManager(
-                User.withUsername(props.adminUsuario()).password("{noop}" + props.adminClave())
-                        .roles(ADMIN).build(),
-                User.withUsername(props.vendedorUsuario()).password("{noop}" + props.vendedorClave())
-                        .roles(VENDEDOR).build());
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
