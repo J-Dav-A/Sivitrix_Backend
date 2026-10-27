@@ -11,7 +11,7 @@
 
 Este informe sigue el artefacto obligatorio del taller (`docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md`, secciones 1 a 8) y agrega la lista de inspección técnica y la pregunta de cierre.
 
-Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Los textos <mark>resaltados en amarillo</mark> son los únicos datos que faltan: los resultados de `mvn test` y los hashes de los commits, que solo existen cuando se ejecuta y se sube el trabajo.
+Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Los textos <mark>resaltados en amarillo</mark> es el único dato que falta: el hash del último commit, que solo existe cuando se sube este informe.
 
 | Sección del taller | Estado | Observación |
 |---|---|---|
@@ -20,9 +20,9 @@ Todo lo que se afirma sobre el código proviene de leer los archivos de las rama
 | 3. Hallazgos | Completa | 7 fichas (el taller exige al menos 3); 2 son hipótesis por verificar. |
 | 4. Priorización | Completa | Escala 1 a 3; selecciona H-02. |
 | 5. Intervención | Completa | Código del refactor y de las pruebas entregado y revisado; se aplica en el repositorio siguiendo la sección 8. |
-| 6. Verificación | Parcial | 36 pruebas «antes» y 43 «después» definidas; falta pegar la salida de `mvn test` (sección 6.4). |
+| 6. Verificación | Completa | Antes: 36 de 36 pruebas aprobadas. Después: 43 de 43. Ambas con evidencia en la sección 6.4. |
 | 7. Cierre | Completa | Incluye respuesta a la pregunta de cierre. |
-| 8. Git | Parcial | Orden y mensajes de commit definidos; faltan los hashes al subirlos. |
+| 8. Git | Parcial | Hashes de los commits 1, 2 y 3 registrados; falta el del commit 4 (este informe). |
 
 # 1. Contexto
 
@@ -412,9 +412,9 @@ cliente.reducirSaldo(cuota.getValor());
 | `cliente/entity/ClienteEmpresarial.java` | Se agregan 4 métodos de dominio | Fin de la clase |
 | `venta/service/VentaServiceImpl.java` | Usa `puedeFinanciar`, `cupoDisponible` y `reducirSaldo` | 105-109 y 173-176 |
 | `credito/service/CreditoServiceImpl.java` | Usa `puedeFinanciar`, `cupoDisponible`, `aumentarSaldo` y `reducirSaldo` | 58-62, 70-71 y 114-117 |
-| `src/test/java/co/edu/uniquindio/sivitrix/venta/VentaServiceImplTest.java` | Nuevo: 11 pruebas de caracterización con Mockito | — |
-| `src/test/java/co/edu/uniquindio/sivitrix/credito/CreditoServiceImplTest.java` | Nuevo: 7 pruebas de caracterización con Mockito | — |
-| `src/test/java/co/edu/uniquindio/sivitrix/cliente/ClienteEmpresarialTest.java` | Nuevo: 7 pruebas de los métodos de dominio (solo después) | — |
+| `VentaServiceImplTest.java` (en `src/test/java/...`) | Nuevo: 11 pruebas de caracterización con Mockito | — |
+| `CreditoServiceImplTest.java` (en `src/test/java/...`) | Nuevo: 7 pruebas de caracterización con Mockito | — |
+| `src/test/java/co/edu/uniquindio/sivitrix/common/util/ClienteEmpresarialTest.java` | Nuevo: 7 pruebas de los métodos de dominio (solo después) | — |
 
 ## 5.4 Qué no cambia
 
@@ -423,7 +423,7 @@ cliente.reducirSaldo(cuota.getValor());
 - Esquema de base de datos y migraciones Flyway.
 - El frontend no se modifica.
 - La duplicación de la validación de stock (H-02, nota) se conserva a propósito.
-  **Estado de la intervención:** el código del refactor y de las tres clases de prueba está escrito y su sintaxis se comprobó con un analizador de Java. Al preparar la entrega, las pruebas se ejecutan con `mvn test` en el equipo del estudiante (en el entorno de análisis no hay acceso a Maven Central), y su salida se registra en la sección 6.4.
+  **Estado de la intervención:** aplicada en el commit 3. El código del refactor y de las tres clases de prueba se ejecutó en el equipo del estudiante con el ejecutor de pruebas de IntelliJ IDEA (el comando `mvn` no está en el PATH de ese equipo); los resultados están en la sección 6.4.
 
 # 6. Verificación
 
@@ -451,10 +451,10 @@ cliente.reducirSaldo(cuota.getValor());
 
 ## 6.3 Cómo ejecutarlas
 
-```bash
-cd sivitrix_backend
-mvn test                                  # antes del refactor (linea base)
-mvn test                                  # despues del refactor (mismas pruebas)
+En IntelliJ IDEA: clic derecho sobre la carpeta `src/test/java` y **Run 'All Tests'**. Para la ejecución «antes», ubicarse primero en el commit de las pruebas (`git switch --detach dde221b`) y volver después con `git switch main`. Con Maven instalado, el equivalente es:
+
+```java
+mvn test                                  # todas las pruebas
 mvn test -Dtest=VentaServiceImplTest      # una clase
 ```
 
@@ -462,8 +462,22 @@ mvn test -Dtest=VentaServiceImplTest      # una clase
 
 | Momento | Pruebas ejecutadas | Aprobadas / fallidas | Evidencia |
 |---|---|---|---|
-| Antes del refactor | 36 esperadas (18 existentes + 11 de `VentaServiceImplTest` + 7 de `CreditoServiceImplTest`)<br>Obtenidas: <mark>completar</mark> | Esperado: 36 aprobadas, 0 fallidas<br>Obtenido: <mark>completar</mark> | `evidencias/mvn-test-antes.txt` |
-| Después del refactor | 43 esperadas (las 36 anteriores + 7 de `ClienteEmpresarialTest`)<br>Obtenidas: <mark>completar</mark> | Esperado: 43 aprobadas, 0 fallidas<br>Obtenido: <mark>completar</mark> | `evidencias/mvn-test-despues.txt` |
+| Antes del refactor (commit `dde221b`) | **36** (18 existentes + 11 de `VentaServiceImplTest` + 7 de `CreditoServiceImplTest`) | **36 aprobadas, 0 fallidas** (2 s 18 ms, «Process finished with exit code 0») | `evidencias/pruebas-antes.png` |
+| Después del refactor (commit `5cd7832`) | **43** (las 36 anteriores + 7 de `ClienteEmpresarialTest`) | **43 aprobadas, 0 fallidas** (2 s 73 ms, «Process finished with exit code 0») | `evidencias/pruebas-despues-a.png` y `pruebas-despues-b.png` |
+
+Las 36 pruebas de la línea base (las 18 que ya existían y las 18 de caracterización) siguen aprobadas después del refactor, lo que respalda que el comportamiento observable se conservó. Las 7 pruebas nuevas de `ClienteEmpresarialTest` fijan las reglas del cupo en su nueva ubicación.
+
+![Figura 4. Ejecución antes del refactor, en el commit dde221b (rama en modo desacoplado): 36 pruebas aprobadas.](evidencias/pruebas-antes.png)
+
+*Figura 4. Ejecución antes del refactor, en el commit dde221b (rama en modo desacoplado): 36 pruebas aprobadas.*
+
+![Figura 5. Ejecución después del refactor (parte superior): 43 pruebas aprobadas.](evidencias/pruebas-despues-a.png)
+
+*Figura 5. Ejecución después del refactor (parte superior): 43 pruebas aprobadas.*
+
+![Figura 6. Ejecución después del refactor (parte inferior): VentaServiceImplTest y CreditoServiceImplTest.](evidencias/pruebas-despues-b.png)
+
+*Figura 6. Ejecución después del refactor (parte inferior): VentaServiceImplTest y CreditoServiceImplTest.*
 
 Referencia: la línea base conocida del proyecto son **18 pruebas unitarias aprobadas** (`UtilidadesDominioTest` y `FinanzasUtilsTest`, ejecutadas el 17 de octubre de 2026); no deben romperse.
 
@@ -501,10 +515,14 @@ El taller sugiere tres commits. Los mensajes propuestos y los campos de hash se 
 
 | # | Mensaje de commit | Contenido | Hash o enlace |
 |---|---|---|---|
-| 1 | `docs: registrar diagnostico tecnico` | `docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md` (secciones 1 a 4) | <mark>completar</mark> |
-| 2 | `test: agregar pruebas de caracterizacion de ventas y credito` | Pruebas con Mockito (línea base «antes») | <mark>completar</mark> |
-| 3 | `refactor: mover regla de cupo y saldo de credito a ClienteEmpresarial` | Cambio de las secciones 5.2 y 5.3 | <mark>completar</mark> |
-| 4 | `docs: documentar verificacion de refactorizacion` | Secciones 5 a 7 y carpeta `evidencias/` | <mark>completar</mark> |
+| 1 | `docs: registrar diagnostico tecnico` | `docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md` (secciones 1 a 4) | `b9c1fbc` · https://github.com/J-Dav-A/sivitrix_backend/commit/b9c1fbc |
+| 2 | `test: agregar pruebas de caracterizacion de ventas y credito` | Pruebas con Mockito (línea base «antes») | `dde221b` · https://github.com/J-Dav-A/sivitrix_backend/commit/dde221b |
+| 3 | `refactor: mover regla de cupo y saldo de credito a ClienteEmpresarial` | Cambio de las secciones 5.2 y 5.3 y `ClienteEmpresarialTest` | `5cd7832` · https://github.com/J-Dav-A/sivitrix_backend/commit/5cd7832 |
+| 4 | `docs: documentar verificacion de refactorizacion` | Secciones 5 a 7 y carpeta `evidencias/` | <mark>completar tras subirlo</mark> |
+
+![Figura 7. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).](evidencias/git-log.png)
+
+*Figura 7. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).*
 
 **Referencia del análisis:** backend `4bca0ba` («arreglo de brecha entre codigo y el excel») y frontend `db05cb8` («arreglo de nit»), ambos en la rama `main`.
 
