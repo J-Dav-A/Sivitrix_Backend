@@ -11,7 +11,7 @@
 
 Este informe sigue el artefacto obligatorio del taller (`docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md`, secciones 1 a 8) y agrega la lista de inspección técnica y la pregunta de cierre.
 
-Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Los textos <mark>resaltados en amarillo</mark> es el único dato que falta: el hash del último commit, que solo existe cuando se sube este informe.
+Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Las capturas de pantalla de las pruebas y del historial de Git están en la carpeta `evidencias/`.
 
 | Sección del taller | Estado | Observación |
 |---|---|---|
@@ -19,10 +19,10 @@ Todo lo que se afirma sobre el código proviene de leer los archivos de las rama
 | 2. Arquitectura real | Completa | Basada en lectura de código; no se ejecutó la aplicación. |
 | 3. Hallazgos | Completa | 7 fichas (el taller exige al menos 3); 2 son hipótesis por verificar. |
 | 4. Priorización | Completa | Escala 1 a 3; selecciona H-02. |
-| 5. Intervención | Completa | Código del refactor y de las pruebas entregado y revisado; se aplica en el repositorio siguiendo la sección 8. |
+| 5. Intervención | Completa | Refactor y pruebas aplicados en los commits 2 y 3 (secciones 5.1 a 5.4). |
 | 6. Verificación | Completa | Antes: 36 de 36 pruebas aprobadas. Después: 43 de 43. Ambas con evidencia en la sección 6.4. |
 | 7. Cierre | Completa | Incluye respuesta a la pregunta de cierre. |
-| 8. Git | Parcial | Hashes de los commits 1, 2 y 3 registrados; falta el del commit 4 (este informe). |
+| 8. Git | Completa | Hashes y enlaces de los 4 commits registrados. |
 
 # 1. Contexto
 
@@ -511,14 +511,14 @@ Referencia: la línea base conocida del proyecto son **18 pruebas unitarias apro
 - **Definición de terminado con criterios de calidad:** incluir en cada historia de Jira «reglas en el dominio, pruebas de la regla y revisión» para que lo documentado se compruebe en el código.
 # 8. Git
 
-El taller sugiere tres commits. Los mensajes propuestos y los campos de hash se completan al subir los cambios a GitHub (las pruebas y el push los realiza el equipo desde su máquina).
+El taller sugiere tres commits; se realizaron cuatro, en este orden: diagnóstico, pruebas de caracterización, refactor y documentación de la verificación.
 
 | # | Mensaje de commit | Contenido | Hash o enlace |
 |---|---|---|---|
 | 1 | `docs: registrar diagnostico tecnico` | `docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md` (secciones 1 a 4) | `b9c1fbc` · https://github.com/J-Dav-A/sivitrix_backend/commit/b9c1fbc |
 | 2 | `test: agregar pruebas de caracterizacion de ventas y credito` | Pruebas con Mockito (línea base «antes») | `dde221b` · https://github.com/J-Dav-A/sivitrix_backend/commit/dde221b |
 | 3 | `refactor: mover regla de cupo y saldo de credito a ClienteEmpresarial` | Cambio de las secciones 5.2 y 5.3 y `ClienteEmpresarialTest` | `5cd7832` · https://github.com/J-Dav-A/sivitrix_backend/commit/5cd7832 |
-| 4 | `docs: documentar verificacion de refactorizacion` | Secciones 5 a 7 y carpeta `evidencias/` | <mark>completar tras subirlo</mark> |
+| 4 | `docs: documentar verificacion de refactorizacion` | Secciones 5 a 7 y carpeta `evidencias/` | `aa4bde8` · https://github.com/J-Dav-A/sivitrix_backend/commit/aa4bde8 |
 
 ![Figura 7. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).](evidencias/git-log.png)
 
