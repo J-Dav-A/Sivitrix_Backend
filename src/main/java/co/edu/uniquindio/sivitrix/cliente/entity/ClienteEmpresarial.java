@@ -1,5 +1,6 @@
 package co.edu.uniquindio.sivitrix.cliente.entity;
 
+import co.edu.uniquindio.sivitrix.common.util.MoneyUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -81,5 +82,26 @@ public class ClienteEmpresarial {
     void onUpdate() {
         this.actualizadoEn = LocalDateTime.now();
     }
-}
 
+    // ---- Reglas del cupo de credito (F-05, SWR-37): viven en el dueno de los datos ----
+
+    /** Cupo restante para nuevos creditos; nunca negativo (se usa en los mensajes al usuario). */
+    public BigDecimal cupoDisponible() {
+        return limiteCredito.subtract(saldoCredito).max(BigDecimal.ZERO);
+    }
+
+    /** El valor cabe en el cupo si no supera limite - saldo (comparacion sin recortar, igual que antes). */
+    public boolean puedeFinanciar(BigDecimal valor) {
+        return valor.compareTo(limiteCredito.subtract(saldoCredito)) <= 0;
+    }
+
+    /** Un credito aprobado aumenta lo que el cliente debe. */
+    public void aumentarSaldo(BigDecimal valor) {
+        this.saldoCredito = MoneyUtils.redondear(saldoCredito.add(valor));
+    }
+
+    /** Un pago o una cancelacion reduce lo que debe; el saldo nunca queda negativo. */
+    public void reducirSaldo(BigDecimal valor) {
+        this.saldoCredito = MoneyUtils.redondear(saldoCredito.subtract(valor).max(BigDecimal.ZERO));
+    }
+}

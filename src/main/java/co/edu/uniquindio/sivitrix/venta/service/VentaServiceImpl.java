@@ -102,10 +102,9 @@ public class VentaServiceImpl implements VentaService {
         }
 
         // Credito: el cupo se valida ya, y queda pendiente de autorizacion del administrador.
-        BigDecimal disponible = cliente.getLimiteCredito().subtract(cliente.getSaldoCredito());
-        if (venta.getTotal().compareTo(disponible) > 0) {
+        if (!cliente.puedeFinanciar(venta.getTotal())) {
             throw new BusinessRuleException("El total de la venta (" + venta.getTotal()
-                    + ") excede el cupo de credito disponible del cliente (" + disponible.max(BigDecimal.ZERO) + ")");
+                    + ") excede el cupo de credito disponible del cliente (" + cliente.cupoDisponible() + ")");
         }
 
         venta.setEstado(EstadoVenta.PENDIENTE_AUTORIZACION);
@@ -171,8 +170,7 @@ public class VentaServiceImpl implements VentaService {
                     throw new BusinessRuleException("No se puede cancelar: el credito ya tiene cuotas pagadas");
                 }
                 ClienteEmpresarial cliente = credito.getCliente();
-                cliente.setSaldoCredito(MoneyUtils.redondear(
-                        cliente.getSaldoCredito().subtract(credito.getValorTotal()).max(BigDecimal.ZERO)));
+                cliente.reducirSaldo(credito.getValorTotal());
                 clienteRepository.save(cliente);
 
                 credito.setEstado(EstadoCredito.CANCELADO);

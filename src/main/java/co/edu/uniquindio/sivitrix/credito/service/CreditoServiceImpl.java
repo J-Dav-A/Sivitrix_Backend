@@ -55,10 +55,9 @@ public class CreditoServiceImpl implements CreditoService {
         exigirPendiente(credito);
 
         ClienteEmpresarial cliente = credito.getCliente();
-        BigDecimal disponible = cliente.getLimiteCredito().subtract(cliente.getSaldoCredito());
-        if (credito.getValorTotal().compareTo(disponible) > 0) {
+        if (!cliente.puedeFinanciar(credito.getValorTotal())) {
             throw new BusinessRuleException("No se puede autorizar: el credito (" + credito.getValorTotal()
-                    + ") excede el cupo disponible del cliente (" + disponible.max(BigDecimal.ZERO) + ")");
+                    + ") excede el cupo disponible del cliente (" + cliente.cupoDisponible() + ")");
         }
 
         generarCuotas(credito);
@@ -67,7 +66,7 @@ public class CreditoServiceImpl implements CreditoService {
         credito.setFechaResolucion(LocalDateTime.now());
 
         // SWR-37: el saldo de credito del cliente sube con cada credito aprobado.
-        cliente.setSaldoCredito(MoneyUtils.redondear(cliente.getSaldoCredito().add(credito.getValorTotal())));
+        cliente.aumentarSaldo(credito.getValorTotal());
         clienteRepository.save(cliente);
 
         // La venta se confirma: descuenta stock y emite la factura.
@@ -112,8 +111,7 @@ public class CreditoServiceImpl implements CreditoService {
 
         // Baja el saldo de credito del cliente.
         ClienteEmpresarial cliente = credito.getCliente();
-        BigDecimal nuevoSaldo = cliente.getSaldoCredito().subtract(cuota.getValor()).max(BigDecimal.ZERO);
-        cliente.setSaldoCredito(MoneyUtils.redondear(nuevoSaldo));
+        cliente.reducirSaldo(cuota.getValor());
         clienteRepository.save(cliente);
 
         boolean todasPagadas = credito.getCuotas().stream().allMatch(c -> c.getEstado() == EstadoCuota.PAGADA);
