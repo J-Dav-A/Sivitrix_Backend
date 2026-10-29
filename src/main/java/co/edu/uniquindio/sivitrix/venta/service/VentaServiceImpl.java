@@ -106,6 +106,8 @@ public class VentaServiceImpl implements VentaService {
             throw new BusinessRuleException("El total de la venta (" + venta.getTotal()
                     + ") excede el cupo de credito disponible del cliente (" + cliente.cupoDisponible() + ")");
         }
+        // H-06: falla pronto si el total no se puede dividir en las cuotas pedidas (antes fallaba al autorizar).
+        validarDivisionEnCuotas(venta.getTotal(), request.numeroCuotas());
 
         venta.setEstado(EstadoVenta.PENDIENTE_AUTORIZACION);
         Venta guardada = ventaRepository.save(venta);
@@ -203,6 +205,14 @@ public class VentaServiceImpl implements VentaService {
         factura.setIva(venta.getIva());
         factura.setTotal(venta.getTotal());
         facturaRepository.save(factura);
+    }
+
+    private void validarDivisionEnCuotas(BigDecimal total, int numeroCuotas) {
+        try {
+            FinanzasUtils.dividirEnCuotas(total, numeroCuotas);
+        } catch (IllegalArgumentException ex) {
+            throw new BusinessRuleException(ex.getMessage());
+        }
     }
 
     private Venta buscarOFallar(Long id) {

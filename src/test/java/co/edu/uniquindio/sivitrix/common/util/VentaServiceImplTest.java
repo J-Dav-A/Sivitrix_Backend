@@ -150,6 +150,28 @@ class VentaServiceImplTest {
         assertEquals(EstadoVenta.PENDIENTE_AUTORIZACION, r.estado());
     }
 
+    // CP-12 (H-06): el total no se puede dividir en las cuotas pedidas -> se rechaza al registrar
+    @Test
+    void ventaACreditoQueNoSePuedeDividirEnLasCuotasPedidasSeRechazaAlRegistrar() {
+        producto.setPrecioVenta(new BigDecimal("0.01"));   // total = 0.02; en 36 cuotas la ultima seria negativa
+
+        BusinessRuleException ex = assertThrows(BusinessRuleException.class,
+                () -> service.registrar(pedido(TipoPago.CREDITO, 36, 1)));
+
+        assertEquals("El valor no se puede dividir en 36 cuotas", ex.getMessage());
+        verify(ventaRepository, never()).save(any(Venta.class));
+        verify(creditoRepository, never()).save(any(Credito.class));
+    }
+
+    // CP-13 (H-06): un total normal en el maximo de cuotas (36) se sigue aceptando
+    @Test
+    void ventaACreditoEnElMaximoDeCuotasSeAcepta() {
+        VentaResponse r = service.registrar(pedido(TipoPago.CREDITO, 36, 2));
+
+        assertEquals(EstadoVenta.PENDIENTE_AUTORIZACION, r.estado());
+        verify(creditoRepository).save(any(Credito.class));
+    }
+
     // CP-10
     @Test
     void ventaConCantidadMayorAlStockSeRechaza() {
