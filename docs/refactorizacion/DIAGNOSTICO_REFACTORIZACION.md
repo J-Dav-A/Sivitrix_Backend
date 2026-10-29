@@ -11,7 +11,7 @@
 
 Este informe sigue el artefacto obligatorio del taller (`docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md`, secciones 1 a 8) y agrega la lista de inspección técnica y la pregunta de cierre.
 
-Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Los textos <mark>resaltados en amarillo</mark> son los datos que faltan: la ejecución de la suite completa tras la corrección de H-06 y el hash del último commit.
+Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**.
 
 | Sección del taller | Estado | Observación |
 |---|---|---|
@@ -20,9 +20,9 @@ Todo lo que se afirma sobre el código proviene de leer los archivos de las rama
 | 3. Hallazgos | Completa | 7 fichas (el taller exige al menos 3); 2 son hipótesis por verificar. |
 | 4. Priorización | Completa | Escala 1 a 3; selecciona H-02. |
 | 5. Intervención | Completa | Dos intervenciones: H-02 (refactor, commits 2 y 3) y H-06 (corrección de defecto, sección 5.5). |
-| 6. Verificación | Parcial | H-02 verificada (36 → 43). H-06: rojo y verde en `VentaServiceImplTest` con evidencia; falta la suite completa (45) en la sección 6.6. |
+| 6. Verificación | Parcial | H-02 verificada (36 → 43). H-06: rojo y verde y suite completa (45 aprobadas) con evidencia. |
 | 7. Cierre | Completa | Incluye respuesta a la pregunta de cierre. |
-| 8. Git | Parcial | Commits 1 a 5 registrados; falta el hash del commit 6 (este informe). |
+| 8. Git | Parcial | Los 6 commits registrados. |
 | 9. Socialización | Completa | Respuestas a las 5 preguntas para las dos intervenciones. |
 
 # 1. Contexto
@@ -543,7 +543,7 @@ Como es una corrección de defecto, se usa el ciclo «rojo, verde»: primero se 
 |---|---|---|---|
 | Rojo: pruebas nuevas sin la corrección | `VentaServiceImplTest` (13 pruebas: 11 anteriores + CP-12 y CP-13) | **12 aprobadas y 1 fallida**: CP-12 («Expected BusinessRuleException to be thrown, but nothing was thrown») | `evidencias/h06-rojo.png` |
 | Verde: con la corrección | `VentaServiceImplTest` (las mismas 13) | **13 aprobadas, 0 fallidas** (exit code 0) | `evidencias/h06-verde.png` |
-| Suite completa con la corrección | Todas las pruebas (45 esperadas: 43 + CP-12 y CP-13) | Esperado: 45 aprobadas, 0 fallidas<br>Obtenido: <mark>completar</mark> | <mark>evidencias/h06-suite.png</mark> |
+| Suite completa con la corrección | Todas las pruebas (45 esperadas: 43 + CP-12 y CP-13) | **45 aprobadas, 0 fallidas** (exit code 0): las 43 anteriores siguen aprobadas | `evidencias/h06-suite.png` |
 
 La prueba CP-12 falló antes de la corrección con la excepción esperada **no lanzada**, lo que confirma el defecto: el registro aceptaba una venta cuyo crédito no se podía autorizar. Con la corrección pasó, y las otras 12 pruebas de la clase (incluida CP-13, 36 cuotas con un total normal) siguieron aprobadas.
 
@@ -589,7 +589,7 @@ El taller sugiere tres commits; se realizaron cuatro, en este orden: diagnóstic
 | 3 | `refactor: mover regla de cupo y saldo de credito a ClienteEmpresarial` | Cambio de las secciones 5.2 y 5.3 y `ClienteEmpresarialTest` | `5cd7832` · https://github.com/J-Dav-A/sivitrix_backend/commit/5cd7832 |
 | 4 | `docs: documentar verificacion de refactorizacion` | Secciones 5 a 7 y carpeta `evidencias/` | `aa4bde8` · https://github.com/J-Dav-A/sivitrix_backend/commit/aa4bde8 |
 | 5 | `validar division en cuotas al registrar venta a credito (H-06)` | Corrección en `VentaServiceImpl`, pruebas CP-12 y CP-13 y capturas rojo/verde | `eaa2a02` · https://github.com/J-Dav-A/sivitrix_backend/commit/eaa2a02 |
-| 6 | `docs: documentar segunda intervencion y preguntas de socializacion` | Secciones 5.5, 6.6 y 9 | <mark>completar</mark> |
+| 6 | `docs: documentar segunda intervencion y preguntas de socializacion` | Secciones 5.5, 6.6 y 9 | `2bb48b2` · https://github.com/J-Dav-A/sivitrix_backend/commit/2bb48b2 |
 
 ![Figura 9. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).](evidencias/git-log.png)
 
