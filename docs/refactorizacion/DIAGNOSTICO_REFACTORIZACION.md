@@ -11,7 +11,7 @@
 
 Este informe sigue el artefacto obligatorio del taller (`docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md`, secciones 1 a 8) y agrega la lista de inspección técnica y la pregunta de cierre.
 
-Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Las capturas de pantalla de las pruebas y del historial de Git están en la carpeta `evidencias/`.
+Todo lo que se afirma sobre el código proviene de leer los archivos de las ramas `main` de los repositorios en GitHub (backend commit `4bca0ba`, frontend commit `db05cb8`). Los números de línea corresponden a esos commits. Lo que depende de ejecutar el sistema se marca como **hipótesis**. Los textos <mark>resaltados en amarillo</mark> son los datos que faltan: la ejecución de la suite completa tras la corrección de H-06 y el hash del último commit.
 
 | Sección del taller | Estado | Observación |
 |---|---|---|
@@ -19,10 +19,11 @@ Todo lo que se afirma sobre el código proviene de leer los archivos de las rama
 | 2. Arquitectura real | Completa | Basada en lectura de código; no se ejecutó la aplicación. |
 | 3. Hallazgos | Completa | 7 fichas (el taller exige al menos 3); 2 son hipótesis por verificar. |
 | 4. Priorización | Completa | Escala 1 a 3; selecciona H-02. |
-| 5. Intervención | Completa | Refactor y pruebas aplicados en los commits 2 y 3 (secciones 5.1 a 5.4). |
-| 6. Verificación | Completa | Antes: 36 de 36 pruebas aprobadas. Después: 43 de 43. Ambas con evidencia en la sección 6.4. |
+| 5. Intervención | Completa | Dos intervenciones: H-02 (refactor, commits 2 y 3) y H-06 (corrección de defecto, sección 5.5). |
+| 6. Verificación | Parcial | H-02 verificada (36 → 43). H-06: rojo y verde en `VentaServiceImplTest` con evidencia; falta la suite completa (45) en la sección 6.6. |
 | 7. Cierre | Completa | Incluye respuesta a la pregunta de cierre. |
-| 8. Git | Completa | Hashes y enlaces de los 4 commits registrados. |
+| 8. Git | Parcial | Commits 1 a 5 registrados; falta el hash del commit 6 (este informe). |
+| 9. Socialización | Completa | Respuestas a las 5 preguntas para las dos intervenciones. |
 
 # 1. Contexto
 
@@ -107,11 +108,11 @@ Se documentan siete hallazgos (el taller exige al menos tres). La categoría sig
 | ID | Hallazgo | Categoría | Certeza | Estado |
 |---|---|---|---|---|
 | H-01 | `VentaServiceImpl` opera directamente sobre el módulo Crédito; rompe la regla de Facade documentada | Riesgo arquitectónico | Hecho | Pendiente |
-| H-02 | Regla de cupo y saldo de crédito duplicada en dos servicios; entidad anémica | Deuda técnica | Hecho | Seleccionado |
+| H-02 | Regla de cupo y saldo de crédito duplicada en dos servicios; entidad anémica | Deuda técnica | Hecho | Verificado |
 | H-03 | Verificación de stock sin bloqueo: posible pérdida de actualización en ventas simultáneas | Riesgo | Hipótesis | Pendiente |
 | H-04 | Listado de ventas: filtro en memoria y consulta N+1 de factura | Oportunidad de mejora | Hecho | Pendiente |
-| H-05 | Ninguna prueba cubre los servicios de venta, crédito e inventario | Deuda técnica | Hecho | Parte de la intervención |
-| H-06 | El número de cuotas se valida tarde y un crédito puede quedar imposible de autorizar | Defecto potencial | Hipótesis | Pendiente |
+| H-05 | Ninguna prueba cubre los servicios de venta, crédito e inventario | Deuda técnica | Hecho | Implementado (ventas y crédito) |
+| H-06 | El número de cuotas se valida tarde y un crédito puede quedar imposible de autorizar | Defecto potencial | Hipótesis | Seleccionado (2.ª intervención) |
 | H-07 | Detalles de código limpio y DTO ausente en `cancelar` | Oportunidad de mejora | Hecho | Pendiente |
 
 ### H-01 · Responsabilidades y acoplamiento entre módulos
@@ -163,7 +164,7 @@ creditoRepository.save(credito);
 | **Acción propuesta** | Agregar a `ClienteEmpresarial` los métodos `cupoDisponible()`, `puedeFinanciar(valor)`, `aumentarSaldo(valor)` y `reducirSaldo(valor)`, y usarlos desde los dos servicios (ver sección 5). Se mantienen los mensajes de error y las interfaces públicas. |
 | **Verificación** | Casos CP-03 a CP-08 y CP-11 antes y después; los resultados deben ser idénticos. |
 | **Nota** | La validación de stock también aparece dos veces (`VentaServiceImpl` 72-75 e `InventarioServiceImpl` 66-69, con el mismo mensaje). Se interpreta como defensa deliberada (fallar antes de armar el detalle y proteger la salida desde cualquier origen), por lo que **no** se incluye en el cambio. |
-| **Estado** | Seleccionado. |
+| **Estado** | Verificado (commits 2, 3 y 4: 36 pruebas antes y 43 después). |
 
 **Evidencia (fragmento literal del código):**
 
@@ -254,20 +255,20 @@ Long facturaId = facturaRepository.findByVentaId(v.getId()).map(Factura::getId).
 | **Impacto y riesgo** | Sin pruebas no se puede demostrar que un refactor conserva el comportamiento (criterio de 20 puntos de la rúbrica). |
 | **Acción propuesta** | Pruebas unitarias con Mockito de `VentaServiceImpl` y `CreditoServiceImpl` (el proyecto ya incluye `spring-boot-starter-test`). |
 | **Verificación** | `mvn test` con los casos CP-01 a CP-11. |
-| **Estado** | Parte de la intervención. |
+| **Estado** | Implementado: 11 pruebas de `VentaServiceImplTest` y 7 de `CreditoServiceImplTest` (commit 2). |
 
 ### H-06 · Validación tardía del número de cuotas
 
 | Campo | Contenido |
 |---|---|
-| **Tipo** | Defecto potencial. **Hipótesis** verificable con una prueba unitaria. |
+| **Tipo** | Defecto potencial. La utilidad ya rechaza el caso (prueba existente `cuotasInvalidasLanzanError`); lo que falta confirmar es que el registro de la venta no lo valida, lo que muestra la prueba CP-12. |
 | **Ubicación** | `VentaServiceImpl.registrar` 49-51 · `CreditoServiceImpl.generarCuotas` 128-135 · `FinanzasUtils.dividirEnCuotas` 33-42. |
 | **Observación** | Al registrar la venta solo se exige que el número de cuotas no sea nulo (el DTO limita 1 a 36). La división real se calcula cuando el administrador autoriza. Si la última cuota resulta ≤ 0 se lanza una excepción en ese momento. Ejemplo: total 1.00 en 36 cuotas da base 0.03 y última cuota 1.00 − 0.03×35 = −0.05. |
 | **Criterio** | Fallar pronto (fail-fast) y consistencia: la solicitud queda pendiente y no se puede aprobar; solo se podría rechazar. |
 | **Impacto y riesgo** | Bajo con precios reales de repuestos, pero la validación llega en el paso equivocado. |
 | **Acción propuesta** | Llamar a `FinanzasUtils.dividirEnCuotas` al registrar (o validar su resultado) para rechazar la venta de inmediato. |
 | **Verificación** | Prueba unitaria `dividirEnCuotas(1.00, 36)`; si lanza excepción, la hipótesis se confirma. |
-| **Estado** | Pendiente. |
+| **Estado** | Seleccionado: segunda intervención (sección 5.5). |
 
 **Evidencia (fragmento literal del código):**
 
@@ -322,6 +323,8 @@ Escala de 1 (bajo) a 3 (alto). **Impacto**: qué tanto mejora el sistema o evita
 | H-07 | 1 | 1 | 1 | Solo legibilidad. |
 
 **Selección:** se refactoriza **H-02**, precedido de las pruebas de caracterización de H-05. Es el cambio con mejor relación impacto/esfuerzo y deja una base mejor para atacar H-01 más adelante: cuando la regla de crédito viva en el dominio, mover la operación de crédito fuera de `VentaServiceImpl` será un cambio más pequeño. H-01, H-03, H-04, H-06 y H-07 quedan como deuda técnica documentada.
+
+**Segunda selección (segunda sesión):** se interviene **H-06**. Es el único hallazgo de tipo defecto, tiene esfuerzo 1, no toca el acoplamiento entre módulos y su hipótesis se comprueba con una prueba que primero falla y luego pasa. A diferencia de H-02, **no es un refactor puro: es una corrección de defecto** y se declara como tal, porque cambia el comportamiento en un caso límite.
 
 # 5. Intervención
 
@@ -425,6 +428,47 @@ cliente.reducirSaldo(cuota.getValor());
 - La duplicación de la validación de stock (H-02, nota) se conserva a propósito.
   **Estado de la intervención:** aplicada en el commit 3. El código del refactor y de las tres clases de prueba se ejecutó en el equipo del estudiante con el ejecutor de pruebas de IntelliJ IDEA (el comando `mvn` no está en el PATH de ese equipo); los resultados están en la sección 6.4.
 
+## 5.5 Segunda intervención: H-06 (corrección de defecto)
+
+**Qué se cambia.** `VentaServiceImpl.registrar` ahora comprueba, al registrar una venta a crédito, que el total se puede dividir en las cuotas pedidas. Antes esa comprobación ocurría solo al autorizar, cuando ya era tarde.
+
+**Declaración:** corrección de defecto. El comportamiento solo cambia cuando el total es tan pequeño, en relación con el número de cuotas, que la última cuota saldría menor o igual a cero (por ejemplo, 0.02 en 36 cuotas). Antes la venta se aceptaba y quedaba pendiente sin poder aprobarse; ahora se rechaza al registrar y no se guarda nada.
+
+**Antes y después en `VentaServiceImpl.registrar`:**
+
+```java
+// ANTES: solo se valida el cupo
+if (!cliente.puedeFinanciar(venta.getTotal())) { throw ... }
+
+venta.setEstado(EstadoVenta.PENDIENTE_AUTORIZACION);
+
+// DESPUES: ademas se valida la division en cuotas
+if (!cliente.puedeFinanciar(venta.getTotal())) { throw ... }
+// H-06: falla pronto si el total no se puede dividir en las cuotas pedidas
+validarDivisionEnCuotas(venta.getTotal(), request.numeroCuotas());
+
+venta.setEstado(EstadoVenta.PENDIENTE_AUTORIZACION);
+```
+
+```java
+private void validarDivisionEnCuotas(BigDecimal total, int numeroCuotas) {
+    try {
+        FinanzasUtils.dividirEnCuotas(total, numeroCuotas);
+    } catch (IllegalArgumentException ex) {
+        throw new BusinessRuleException(ex.getMessage());
+    }
+}
+```
+
+| Archivo | Cambio | Líneas |
+|---|---|---|
+| `venta/service/VentaServiceImpl.java` | Llamada nueva en `registrar` y método privado `validarDivisionEnCuotas` | +11 aprox. |
+| `VentaServiceImplTest.java` | Pruebas nuevas CP-12 y CP-13 | +22 |
+
+**Qué no cambia:** las ventas válidas (incluida una de 36 cuotas con un total normal), el orden de las demás validaciones (el cupo se sigue comprobando primero), los mensajes existentes, las interfaces públicas, el esquema de base de datos y el frontend. No se agregan dependencias: `VentaServiceImpl` ya importaba `FinanzasUtils`.
+
+**Deuda menor que deja:** el `try/catch` que traduce la excepción también existe en `CreditoServiceImpl.generarCuotas` (líneas 131-135); podría extraerse a un solo lugar.
+
 # 6. Verificación
 
 ## 6.1 Estrategia
@@ -486,6 +530,31 @@ Referencia: la línea base conocida del proyecto son **18 pruebas unitarias apro
 - Las pruebas con Mockito comprueban la lógica de los servicios, pero no el comportamiento real de PostgreSQL ni de JPA (flush, restricciones). Una prueba de integración con la base real queda como mejora.
 - El refactor no cubre la concurrencia (H-03) ni el rendimiento (H-04).
 - Comprobación manual complementaria: en la aplicación, registrar una venta a crédito, autorizarla, pagar una cuota y anular otra, y comparar el saldo del cliente con lo esperado.
+## 6.6 Verificación de la segunda intervención (H-06)
+
+Como es una corrección de defecto, se usa el ciclo «rojo, verde»: primero se agrega la prueba que reproduce el defecto y se comprueba que **falla**; luego se aplica la corrección y se comprueba que **pasa** sin romper las demás.
+
+| ID | Caso | Resultado esperado | Hallazgo |
+|---|---|---|---|
+| CP-12 | Venta a crédito de un producto de 0.01 en 36 cuotas (total 0.02). | Antes: se acepta (la prueba falla, confirma el defecto). Después: `BusinessRuleException` «El valor no se puede dividir en 36 cuotas»; no se guarda la venta ni el crédito. | H-06 |
+| CP-13 | Venta a crédito de 238.000 en 36 cuotas (máximo permitido). | Se acepta antes y después (queda PENDIENTE_AUTORIZACION). | H-06 |
+
+| Momento | Qué se ejecutó | Resultado | Evidencia |
+|---|---|---|---|
+| Rojo: pruebas nuevas sin la corrección | `VentaServiceImplTest` (13 pruebas: 11 anteriores + CP-12 y CP-13) | **12 aprobadas y 1 fallida**: CP-12 («Expected BusinessRuleException to be thrown, but nothing was thrown») | `evidencias/h06-rojo.png` |
+| Verde: con la corrección | `VentaServiceImplTest` (las mismas 13) | **13 aprobadas, 0 fallidas** (exit code 0) | `evidencias/h06-verde.png` |
+| Suite completa con la corrección | Todas las pruebas (45 esperadas: 43 + CP-12 y CP-13) | Esperado: 45 aprobadas, 0 fallidas<br>Obtenido: <mark>completar</mark> | <mark>evidencias/h06-suite.png</mark> |
+
+La prueba CP-12 falló antes de la corrección con la excepción esperada **no lanzada**, lo que confirma el defecto: el registro aceptaba una venta cuyo crédito no se podía autorizar. Con la corrección pasó, y las otras 12 pruebas de la clase (incluida CP-13, 36 cuotas con un total normal) siguieron aprobadas.
+
+![Figura 7. Rojo: 1 prueba fallida (CP-12) y 12 aprobadas, sin la corrección.](evidencias/h06-rojo.png)
+
+*Figura 7. Rojo: 1 prueba fallida (CP-12) y 12 aprobadas, sin la corrección.*
+
+![Figura 8. Verde: las 13 pruebas de VentaServiceImplTest aprobadas con la corrección.](evidencias/h06-verde.png)
+
+*Figura 8. Verde: las 13 pruebas de VentaServiceImplTest aprobadas con la corrección.*
+
 # 7. Cierre
 
 ## 7.1 Lecciones
@@ -498,7 +567,7 @@ Referencia: la línea base conocida del proyecto son **18 pruebas unitarias apro
 - H-01: reducir el acoplamiento de `VentaServiceImpl` con Crédito mediante una interfaz de puerto o eventos.
 - H-03: decidir entre bloqueo optimista o pesimista del stock, o aceptar y documentar el riesgo.
 - H-04: filtros en el repositorio y carga de facturas en bloque.
-- H-06: validar la división en cuotas al registrar la venta.
+- H-06 se corrigió en la segunda intervención (sección 5.5); queda la duplicación menor del `try/catch` con `CreditoServiceImpl`.
 - H-07: DTO para `cancelar` y limpieza de formato.
 - Pruebas de integración con PostgreSQL y medición de cobertura (JaCoCo).
 ## 7.3 Pregunta de cierre
@@ -519,11 +588,37 @@ El taller sugiere tres commits; se realizaron cuatro, en este orden: diagnóstic
 | 2 | `test: agregar pruebas de caracterizacion de ventas y credito` | Pruebas con Mockito (línea base «antes») | `dde221b` · https://github.com/J-Dav-A/sivitrix_backend/commit/dde221b |
 | 3 | `refactor: mover regla de cupo y saldo de credito a ClienteEmpresarial` | Cambio de las secciones 5.2 y 5.3 y `ClienteEmpresarialTest` | `5cd7832` · https://github.com/J-Dav-A/sivitrix_backend/commit/5cd7832 |
 | 4 | `docs: documentar verificacion de refactorizacion` | Secciones 5 a 7 y carpeta `evidencias/` | `aa4bde8` · https://github.com/J-Dav-A/sivitrix_backend/commit/aa4bde8 |
+| 5 | `validar division en cuotas al registrar venta a credito (H-06)` | Corrección en `VentaServiceImpl`, pruebas CP-12 y CP-13 y capturas rojo/verde | `eaa2a02` · https://github.com/J-Dav-A/sivitrix_backend/commit/eaa2a02 |
+| 6 | `docs: documentar segunda intervencion y preguntas de socializacion` | Secciones 5.5, 6.6 y 9 | <mark>completar</mark> |
 
-![Figura 7. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).](evidencias/git-log.png)
+![Figura 9. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).](evidencias/git-log.png)
 
-*Figura 7. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).*
+*Figura 9. Historial del repositorio con los commits 1, 2 y 3 en `main` (`git log --oneline`).*
 
 **Referencia del análisis:** backend `4bca0ba` («arreglo de brecha entre codigo y el excel») y frontend `db05cb8` («arreglo de nit»), ambos en la rama `main`.
 
 **Entrega al docente:** enlace al repositorio, ruta del informe (`docs/refactorizacion/DIAGNOSTICO_REFACTORIZACION.md`), enlaces a los commits y resultados de las pruebas.
+
+# 9. Preguntas de socialización
+
+Respuestas a las cinco preguntas de la segunda sesión, para cada una de las dos intervenciones.
+
+## 9.1 Primera intervención: H-02 (refactor de la regla de cupo y saldo)
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Cuál era el problema identificado y dónde estaba localizado? | La regla del cupo de crédito y del saldo del cliente estaba repetida: `VentaServiceImpl.registrar` (105-109) y `cancelar` (173-176), y `CreditoServiceImpl.autorizar` (58-62 y 70-71) y `pagarCuota` (114-117). Mientras tanto, `ClienteEmpresarial`, dueña de esos datos, solo tenía getters y setters. |
+| ¿Qué principio de diseño o atributo de calidad estaba comprometido? | DRY y cohesión (la regla debe vivir junto a los datos que protege), responsabilidad única de los servicios y, como atributo de calidad, la **modificabilidad**: cambiar la política del cupo obligaba a editar varios sitios. |
+| ¿Qué modificación realizaron y cómo cambiaron las responsabilidades o dependencias? | Se agregaron a `ClienteEmpresarial` los métodos `cupoDisponible`, `puedeFinanciar`, `aumentarSaldo` y `reducirSaldo`; los dos servicios los llaman en lugar de calcular. La responsabilidad de la regla pasó de dos servicios a la entidad. Dependencias entre módulos: no cambian; solo la entidad usa ahora `MoneyUtils`, una utilidad sin estado. |
+| ¿Qué consecuencias tiene el cambio sobre la arquitectura de la aplicación? | El modelo de dominio es menos anémico y los servicios quedan más delgados (solo orquestan). Las interfaces públicas, el esquema y el frontend no cambian. Una futura política (por ejemplo, contar los créditos pendientes dentro del cupo) se cambia en un solo lugar. No resuelve H-01 (el acoplamiento entre Venta y Crédito sigue), pero lo deja más fácil de atacar. |
+| ¿Qué evidencias demuestran que la funcionalidad conserva su comportamiento? | 36 pruebas aprobadas antes del refactor (commit `dde221b`) y 43 después (commit `5cd7832`), con 0 fallos. Los mismos mensajes de error están fijados por las pruebas CP-03 y CP-06. Capturas en la sección 6.4. |
+
+## 9.2 Segunda intervención: H-06 (corrección del número de cuotas)
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Cuál era el problema identificado y dónde estaba localizado? | Una venta a crédito se registraba sin comprobar que el total se pudiera dividir en las cuotas pedidas. El error llegaba recién al autorizar (`CreditoServiceImpl.generarCuotas` 128-135, que usa `FinanzasUtils.dividirEnCuotas` 33-42) y dejaba el crédito pendiente sin poder aprobarse. El origen está en `VentaServiceImpl.registrar` (49-51), que solo exige que las cuotas no sean nulas. |
+| ¿Qué principio de diseño o atributo de calidad estaba comprometido? | **Fail-fast** (validar lo antes posible) y, como atributo, la **confiabilidad** y la consistencia de los datos: no deben quedar solicitudes imposibles de resolver. |
+| ¿Qué modificación realizaron y cómo cambiaron las responsabilidades o dependencias? | Se agregó en `registrar` una llamada a `validarDivisionEnCuotas`, que reutiliza `FinanzasUtils.dividirEnCuotas` y convierte su excepción en `BusinessRuleException` con el mismo mensaje. Ahora Venta garantiza que lo que registra se puede autorizar, y Crédito sigue generando las cuotas. No se agregan dependencias. |
+| ¿Qué consecuencias tiene el cambio sobre la arquitectura de la aplicación? | Es una corrección de defecto, no un refactor puro: el comportamiento cambia solo en el caso límite (total muy pequeño con muchas cuotas), que antes se aceptaba y ahora se rechaza al registrar sin guardar nada. Ventas válidas, interfaces públicas, esquema y frontend no cambian. Deja una duplicación menor del `try/catch` con `CreditoServiceImpl`. |
+| ¿Qué evidencias demuestran que la funcionalidad conserva su comportamiento? | La prueba CP-12 falla sin la corrección (confirma el defecto) y pasa con ella; CP-13 comprueba que 36 cuotas con un total normal se sigue aceptando; las 43 pruebas anteriores deben seguir aprobadas (la ejecución de la suite completa se registra en la sección 6.6). Resultado: CP-12 fallida antes y aprobada después; las 13 pruebas de `VentaServiceImplTest` aprobadas con la corrección (sección 6.6). |
